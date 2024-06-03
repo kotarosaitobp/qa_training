@@ -17,6 +17,7 @@ class ServiceMakeFeatures:
     VALID_SEX = ["male", "female"]
     VALID_EMBARKED = ["C", "Q", "S"]
     FEATURE_COLUMNS = ["Sex", "Embarked", "Pclass", "Age", "Fare"]
+    CATEGORICAL_COLUMNS = ["Embarked"]
 
     def run(
         self, df_customer_info: pd.DataFrame
@@ -102,5 +103,9 @@ class ServiceMakeFeatures:
         df_obeyed.loc[:, "Sex"] = (
             df_obeyed["Sex"].replace({"male": 0, "female": 1}).astype("int64")
         )
-        df_obeyed = pd.get_dummies(df_obeyed, columns=["Embarked"], dtype=float)
+        df_obeyed = pd.get_dummies(
+            df_obeyed,
+            columns=self.CATEGORICAL_COLUMNS,
+            dtype=float
+            )
         return df_obeyed

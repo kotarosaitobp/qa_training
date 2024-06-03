@@ -52,9 +52,17 @@ class ServiceMakeFeatures:
 
     def _handle_missing_values(self, df_customer_info) -> pd.DataFrame:
         """欠損値処理する."""
-        df_customer_info["Age"] = df_customer_info["Age"].fillna(10)
-        df_customer_info["Cabin"] = df_customer_info["Cabin"].fillna("S")
-        df_customer_info = df_customer_info.dropna()
+        df_customer_info["Sex"] = df_customer_info["Sex"].fillna("male")
+        df_customer_info["Age"] = df_customer_info["Age"].fillna(20)
+        df_customer_info["Embarked"] = df_customer_info["Embarked"].fillna("S")
+        df_customer_info["Pclass"] = df_customer_info["Pclass"].fillna(2)
+        df_customer_info = df_customer_info.dropna(subset=[
+            "Sex",
+            "Embarked",
+            "Pclass",
+            "Age",
+            "Fare"
+        ])
         return df_customer_info
 
     def _handle_violations(self, df_filled) -> pd.DataFrame:
@@ -62,16 +70,22 @@ class ServiceMakeFeatures:
         df_filled = df_filled[df_filled["Pclass"].isin([1, 2, 3])]
         df_filled = df_filled[df_filled["Sex"].isin(["male", "female"])]
         df_filled = df_filled[
-            (df_filled["Age"] >= 0) & (df_filled["Age"].apply(float.is_integer))
+            (df_filled["Age"] >= 0) &
+            (df_filled["Age"] <= 130) &
+            (df_filled["Age"].apply(float.is_integer))
+        ]
+        df_filled = df_filled[
+            (df_filled["Fare"] >= 0) &
+            (df_filled["Fare"] <= 1000) &
+            (df_filled["Fare"].apply(lambda x: isinstance(x, float)))
         ]
         df_filled = df_filled[df_filled["Embarked"].isin(["C", "Q", "S"])]
-
         return df_filled
 
     def _make_features(self, df_obeyed: pd.DataFrame) -> pd.DataFrame:
         """特徴量を作る."""
         df_obeyed = df_obeyed[
-            ["PassengerId", "Sex", "Embarked", "Pclass", "Age", "Fare"]
+            ["Sex", "Embarked", "Pclass", "Age", "Fare"]
         ]
         df_obeyed.loc[:, "Sex"] = (
             df_obeyed["Sex"].replace({"male": 0, "female": 1}).astype("int64")

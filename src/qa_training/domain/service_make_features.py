@@ -16,6 +16,7 @@ class ServiceMakeFeatures:
     VALID_PCLASS = [1, 2, 3]
     VALID_SEX = ["male", "female"]
     VALID_EMBARKED = ["C", "Q", "S"]
+    FEATURE_COLUMNS = ["Sex", "Embarked", "Pclass", "Age", "Fare"]
 
     def run(
         self, df_customer_info: pd.DataFrame
@@ -73,13 +74,7 @@ class ServiceMakeFeatures:
         df_customer_info["Pclass"] = df_customer_info["Pclass"].fillna(
             self.DEFAULT_PCLASS
             )
-        df_customer_info = df_customer_info.dropna(subset=[
-            "Sex",
-            "Embarked",
-            "Pclass",
-            "Age",
-            "Fare"
-        ])
+        df_customer_info = df_customer_info.dropna(subset=self.FEATURE_COLUMNS)
         return df_customer_info
 
     def _handle_violations(self, df_filled) -> pd.DataFrame:
@@ -102,7 +97,7 @@ class ServiceMakeFeatures:
     def _make_features(self, df_obeyed: pd.DataFrame) -> pd.DataFrame:
         """特徴量を作る."""
         df_obeyed = df_obeyed[
-            ["Sex", "Embarked", "Pclass", "Age", "Fare"]
+            self.FEATURE_COLUMNS
         ]
         df_obeyed.loc[:, "Sex"] = (
             df_obeyed["Sex"].replace({"male": 0, "female": 1}).astype("int64")

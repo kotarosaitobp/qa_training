@@ -18,6 +18,8 @@ class ServiceMakeFeatures:
     VALID_EMBARKED = ["C", "Q", "S"]
     FEATURE_COLUMNS = ["Sex", "Embarked", "Pclass", "Age", "Fare"]
     CATEGORICAL_COLUMNS = ["Embarked"]
+    AGE_BINS = [0, 10, 18, 40, 64, float('inf')]
+    AGE_LABELS = ['0-10', '11-18', '19-40', '41-64', '65+']
 
     def run(
         self, df_customer_info: pd.DataFrame
@@ -108,4 +110,11 @@ class ServiceMakeFeatures:
             columns=self.CATEGORICAL_COLUMNS,
             dtype=float
             )
+
+        df_obeyed['AgeGroup'] = pd.cut(
+            df_obeyed['Age'], bins=self.AGE_BINS, labels=self.AGE_LABELS, right=False)
+        df_obeyed = pd.get_dummies(
+            df_obeyed, columns=['AgeGroup'], prefix='Age', dtype=int)
+        df_obeyed.drop(columns=['Age'], inplace=True)
+        print(df_obeyed)
         return df_obeyed
